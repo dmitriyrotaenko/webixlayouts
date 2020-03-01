@@ -1,29 +1,32 @@
-const addFilm = table => {
+const addFilm = () => {
   const values = $$("form").getValues();
-  const id = table.getLastId() + 1;
+  const id = webix.uid();
+
 
   const { title, year, rating, votes } = values;
 
-  table.add({
+  $$("films").add({
     id,
     title,
     year,
     rating,
-    votes,
-    rank: id
+    votes
   });
 };
 
 
-const clearFields = form => {
+function clearFields() {
+
+  const form = this.getFormView();
 
   webix.confirm({
-    title: 'Clear fileds?',
-    text: 'All fields will be cleared! Are you sure?',
-    ok: 'Yes', cancel: 'No'
+    title: "Clear fileds?",
+    text: "All fields will be cleared! Are you sure?",
+    ok: "Yes", cancel: "No"
   })
   .then(() => {
     form.clear();
+    form.clearValidation();
   })
 }
 

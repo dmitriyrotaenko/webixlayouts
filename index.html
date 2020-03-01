@@ -84,7 +84,7 @@
       rules: {
         title: webix.rules.isNotEmpty,
 
-        year(y) {
+        year: function(y) {
           const current = new Date().getFullYear();
 
           return webix.rules.isNumber(y) 
@@ -92,11 +92,11 @@
               && y <= current;
         },
 
-        rating(r) {
+        rating: function(r) {
           return webix.rules.isNumber(r) && r != 0;
         },
 
-        votes(v) {
+        votes: function(v) {
           return webix.rules.isNumber(v) && v < 100000;
         }  
       },
@@ -109,18 +109,15 @@
         { view: "text", label: "Rating", name: "rating", invalidMessage: "Rating cannot be empty or greater than 0"},
         { view: "text", label: "Votes", name: "votes", invalidMessage: "Votes cannot exceed 100.000 or be empty"},
 
-
-
         {
-          view: "toolbar",
           margin: 15,
           cols: [
             { view: "button", value: "Add new", css: "webix_primary",
-              click() {
-                const form = $$("form");
+              click: function() {
+                const form = this.getFormView();
 
                 if(form.validate()) {
-                  addFilm($$("films")); // external function (inside formLogic.js)
+                  addFilm(); // external function (inside formLogic.js)
 
                   webix.message({type: "success", text: "Film was added successfully"});
 
@@ -129,9 +126,7 @@
               } 
             },
             { view: "button", value: "Clear",
-              click() {
-                clearFields($$("form")); // from formLogic.js 
-              }
+              click: clearFields
             }
           ]
         }
@@ -178,7 +173,7 @@
       }
     })
 
-    webix.ready(() => {
+    webix.ready(function() {
       webix.ui({
         rows: [Header, mainContent, Footer]
       });
