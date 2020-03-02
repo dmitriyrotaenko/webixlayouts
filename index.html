@@ -3,6 +3,7 @@
 <head>
   <script src="https://cdn.webix.com/edge/webix.js" type="text/javascript"></script>
   <script type="text/javascript" src="testdata.js"></script>
+  <script src="formLogic.js"></script>
   <link rel="stylesheet" href="https://cdn.webix.com/edge/webix.css" type="text/css">  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +29,7 @@
   </style>
 
   <script type="text/javascript" charset="utf-8">
-  
+
     const Header = {
       view: "toolbar",
       css: "webix_dark",
@@ -36,7 +37,8 @@
         { template: "My App", type: "header", width: 100, borderless: true},
         {},
         { view: "button", label: "Profile", type: "icon",
-          icon: "wxi-user", width: 100, css: "webix_transparent"
+          icon: "wxi-user", width: 100, css: "webix_transparent",
+          popup: "menu_popup"
         }
       ]
     } 
@@ -65,6 +67,7 @@
 
     const table = {
       view: "datatable",
+      id: "films",
       autoConfig: true,
       data: small_film_set,
       scrollX: false,
@@ -74,19 +77,57 @@
 
     const forms = {
       view: "form",
+      id: "form",
       type: "clean",
       margin: 10,
+
+      rules: {
+        title: webix.rules.isNotEmpty,
+
+        year: function(y) {
+          const current = new Date().getFullYear();
+
+          return webix.rules.isNumber(y) 
+              && y >= 1970 
+              && y <= current;
+        },
+
+        rating: function(r) {
+          return webix.rules.isNumber(r) && r != 0;
+        },
+
+        votes: function(v) {
+          return webix.rules.isNumber(v) && v < 100000;
+        }  
+      },
+
+
+
       elements: [
-        { view: "text", label: "Title" },
-        { view: "text", label: "Year" },
-        { view: "text", label: "Rating" },
-        { view: "text", label: "Rank"},
+        { view: "text", label: "Title", name: "title", invalidMessage: "This field cannot be empty" },
+        { view: "text", label: "Year", name: "year", invalidMessage: "Film must be of no earlier than 1970"},
+        { view: "text", label: "Rating", name: "rating", invalidMessage: "Rating cannot be empty or greater than 0"},
+        { view: "text", label: "Votes", name: "votes", invalidMessage: "Votes cannot exceed 100.000 or be empty"},
+
         {
-          view: "toolbar",
           margin: 15,
           cols: [
-            { view: "button", value: "Add new", css: "webix_primary" },
-            { view: "button", value: "Clear" }
+            { view: "button", value: "Add new", css: "webix_primary",
+              click: function() {
+                const form = this.getFormView();
+
+                if(form.validate()) {
+                  addFilm(); // external function (inside formLogic.js)
+
+                  webix.message({type: "success", text: "Film was added successfully"});
+
+                  form.clear();
+                }
+              } 
+            },
+            { view: "button", value: "Clear",
+              click: clearFields
+            }
           ]
         }
       ],
@@ -122,16 +163,15 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
+    const menuPopUp = webix.ui({
+      view: "popup",
+      id: "menu_popup",
+      body: {
+        view: "list",
+        data: ["Settings", "Log Out"],
+        autoheight: true
+      }
+    })
 
     webix.ready(function() {
       webix.ui({
