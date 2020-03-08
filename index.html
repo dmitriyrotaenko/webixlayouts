@@ -4,7 +4,8 @@
   <script src="https://cdn.webix.com/edge/webix.js" type="text/javascript"></script>
   <script type="text/javascript" src="testdata.js"></script>
   <script src="formLogic.js"></script>
-  <link rel="stylesheet" href="https://cdn.webix.com/edge/webix.css" type="text/css">  
+  <script src="table.js"></script>
+  <link rel="stylesheet" href="https://cdn.webix.com/edge/webix.css" type="text/css"> 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webix First App</title>
@@ -13,6 +14,15 @@
 
 
   <style>
+
+    :root {
+      --light-blue: rgb(244, 245, 249);
+    }
+
+    .table__header {
+      background: var(--light-blue);
+
+    }
 
     .menu {
       background: rgb(237, 239, 240);
@@ -25,6 +35,12 @@
     .connected {
       color: green;
       text-align: center;
+    }
+
+    .row-hovered {
+      background: red;
+      cursor: pointer;
+      background: var(--light-blue);
     }
   </style>
 
@@ -44,12 +60,29 @@
     } 
 
     const menu = {
-      view: "menu", 
+      view: "list",
+      autoheight: true,
+      id: "menuList",
       layout: "y", 
       width: 200,
-      data: ["Dashboard", "Users", "Products", "Locations"],
-      css: "menu" // for the light-blue background 
+      data: ["Dashboard", "Users", "Products", "Admin"],
+      css: "menu", // for the light-blue background 
+      select: true,
+      on: {
+        onAfterSelect:function(id) {
+          $$(id).show();
+        }
+      },
+      ready:function() {
+        this.select(this.getFirstId());
+      }
     }
+
+    
+
+    
+
+
 
 
     const sideBar = {
@@ -68,11 +101,35 @@
     const table = {
       view: "datatable",
       id: "films",
-      autoConfig: true,
-      data: small_film_set,
+      select: true,
+      scheme: {
+        $init:function(obj) {
+          obj.votes = +obj.votes.replace(",",""); // type coercion "+"
+        }
+      },
+      columns: [
+        { id: "rank", header: "", template: "#rank#", css: "table__header", width: 50},
+        { id: "title", header: ["Film Title", {content: "textFilter"}], template: "#title#", sort: "string", fillspace: true},
+        { id: "year", header: ["Released", {content: "numberFilter"}], template: "#year#", sort: "int"},
+        { id: "votes", header: ["Votes", {content: "numberFilter"}], template: "#votes#", sort: "int" },
+        { id: "delete", header: "", template: "<span class='delBtn webix_icon wxi-trash'></span>", width: 50}
+      ],
       scrollX: false,
+      url: "data/data.js",
+
+      on: {
+        onAfterSelect: passValuesToForm,
+      },
+
+      onClick: {
+        "delBtn": deleteFilm
+      },
+
+      hover: "row-hovered"
+      
     } 
 
+    
 
 
     const forms = {
@@ -127,6 +184,10 @@
             },
             { view: "button", value: "Clear",
               click: clearFields
+            },
+            {
+              view: "button", value: "Save",
+              click: updateFilm
             }
           ]
         }
@@ -150,13 +211,28 @@
       cols: [
         sideBar,
         {view: "resizer"},
-        table,
-        formSection
+        {
+          cells: [
+            {
+              id: "Dashboard", cols: [table, formSection]
+            },
+            {
+              id: "Users", template: "Users"
+            },
+            {
+              id: "Products", template: "Products"
+            },
+            {
+              id: "Admin", template: "Admin"
+            }
+          ]
+        }
       ]
     }
 
     const Footer = {
       css: {"text-align": "center"},
+      type: "line",
       height: 35,
       template: "The software is provided by <a target=\"_blank\" href=\"https://webix.com/\">https://webix.com</a>. All rights reserved &#9400;" 
     }
@@ -173,9 +249,15 @@
       }
     })
 
+
+
     webix.ready(function() {
-      webix.ui({
-        rows: [Header, mainContent, Footer]
+      webix.ui({  
+        rows: [
+          Header,
+          mainContent,
+          Footer
+        ]
       });
     });
   </script>

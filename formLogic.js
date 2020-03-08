@@ -27,7 +27,26 @@ function clearFields() {
   .then(() => {
     form.clear();
     form.clearValidation();
+
+    $$("films").unselectAll();
   })
+}
+
+function updateFilm() {
+  const form = this.getFormView();
+  const filmList = $$("films");
+
+  const filmData = form.getValues();
+
+  if(filmData.id) {
+    filmList.updateItem(filmData.id, filmData);
+    form.clear();
+    form.clearValidation();
+  }
+  else webix.message({type: "error", text: "Something went wrong"});
+
+
+  filmList.unselectAll();
 }
 
 
