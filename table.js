@@ -15,9 +15,7 @@ function deleteItem(e, id) {
   })
   .then(() => {
     this.remove(id);
-    if(this.getParentView() === $$("Dashboard")) {
-      $$("form").clear();
-    }
+    $$("form").clear();
   })
 
   return false;
