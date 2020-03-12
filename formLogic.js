@@ -1,17 +1,21 @@
-const addFilm = () => {
-  const values = $$("form").getValues();
-  const id = webix.uid();
+function saveFilm() {
+  const films = $$("films");
+  const form = this.getFormView();
+  const filmData = form.getValues();
 
+  if(filmData.id) {
+    films.updateItem(filmData.id, filmData);
+  } else {
+    if(form.validate()) {
+      films.add(filmData);
+      webix.message({type: "success", text: "Film was added successfully"});
+      films.showItem(filmData.id)
 
-  const { title, year, rating, votes } = values;
-
-  $$("films").add({
-    id,
-    title,
-    year,
-    rating,
-    votes
-  });
+      form.clear();
+      form.clearValidation();
+      films.unselectAll();
+    } 
+  }
 };
 
 
@@ -31,23 +35,5 @@ function clearFields() {
     $$("films").unselectAll();
   })
 }
-
-function updateFilm() {
-  const form = this.getFormView();
-  const filmList = $$("films");
-
-  const filmData = form.getValues();
-
-  if(filmData.id) {
-    filmList.updateItem(filmData.id, filmData);
-    form.clear();
-    form.clearValidation();
-  }
-  else webix.message({type: "error", text: "Something went wrong"});
-
-
-  filmList.unselectAll();
-}
-
 
 

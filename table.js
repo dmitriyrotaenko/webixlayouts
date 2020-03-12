@@ -7,15 +7,18 @@ function passValuesToForm(id) {
 
 
 
-function deleteFilm(e, id) {
-
+function deleteItem(e, id) {
   webix.confirm({
-    title: "Delete this film?",
-    text: "Film will be deleted",
+    title: "Delete this item?",
+    text: "Item will be deleted",
     ok: "Yes", cancel: "No"
   })
   .then(() => {
     this.remove(id);
-    $$("form").clear();
+    if(this.getParentView() === $$("Dashboard")) {
+      $$("form").clear();
+    }
   })
+
+  return false;
 }

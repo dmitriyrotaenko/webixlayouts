@@ -5,6 +5,8 @@
   <script type="text/javascript" src="testdata.js"></script>
   <script src="formLogic.js"></script>
   <script src="table.js"></script>
+  <script src="users.js"></script>
+  <script src="Products.js"></script>
   <link rel="stylesheet" href="https://cdn.webix.com/edge/webix.css" type="text/css"> 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,6 +44,17 @@
       cursor: pointer;
       background: var(--light-blue);
     }
+
+    .flex .webix_list_item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flex .webix_list_item:nth-child(-n+5) {
+      background: lightblue;
+    }
+
   </style>
 
   <script type="text/javascript" charset="utf-8">
@@ -122,7 +135,7 @@
       },
 
       onClick: {
-        "delBtn": deleteFilm
+        "delBtn": deleteItem
       },
 
       hover: "row-hovered"
@@ -150,7 +163,7 @@
         },
 
         rating: function(r) {
-          return webix.rules.isNumber(r) && r != 0;
+          return webix.rules.isNumber(r) && r >= 0;
         },
 
         votes: function(v) {
@@ -163,31 +176,17 @@
       elements: [
         { view: "text", label: "Title", name: "title", invalidMessage: "This field cannot be empty" },
         { view: "text", label: "Year", name: "year", invalidMessage: "Film must be of no earlier than 1970"},
-        { view: "text", label: "Rating", name: "rating", invalidMessage: "Rating cannot be empty or greater than 0"},
+        { view: "text", label: "Rating", name: "rating", invalidMessage: "Rating cannot be empty or less than 0"},
         { view: "text", label: "Votes", name: "votes", invalidMessage: "Votes cannot exceed 100.000 or be empty"},
 
         {
           margin: 15,
           cols: [
-            { view: "button", value: "Add new", css: "webix_primary",
-              click: function() {
-                const form = this.getFormView();
-
-                if(form.validate()) {
-                  addFilm(); // external function (inside formLogic.js)
-
-                  webix.message({type: "success", text: "Film was added successfully"});
-
-                  form.clear();
-                }
-              } 
+            { view: "button", value: "Save", css: "webix_primary",
+              click: saveFilm
             },
             { view: "button", value: "Clear",
               click: clearFields
-            },
-            {
-              view: "button", value: "Save",
-              click: updateFilm
             }
           ]
         }
@@ -216,12 +215,8 @@
             {
               id: "Dashboard", cols: [table, formSection]
             },
-            {
-              id: "Users", template: "Users"
-            },
-            {
-              id: "Products", template: "Products"
-            },
+            Users,
+            Products,
             {
               id: "Admin", template: "Admin"
             }
@@ -252,13 +247,17 @@
 
 
     webix.ready(function() {
-      webix.ui({  
+      webix.ui({
+        // type: "clean",  
         rows: [
           Header,
           mainContent,
           Footer
         ]
       });
+      $$("usersList").sync(usersInfo);
+      $$("usersChart").sync(usersInfo);
+      $$("Products").load("data/products.js");
     });
   </script>
 </body>
