@@ -163,7 +163,7 @@
         },
 
         rating: function(r) {
-          return webix.rules.isNumber(r) && r >= 0;
+          return webix.rules.isNumber(r) && r > 0;
         },
 
         votes: function(v) {
@@ -176,7 +176,7 @@
       elements: [
         { view: "text", label: "Title", name: "title", invalidMessage: "This field cannot be empty" },
         { view: "text", label: "Year", name: "year", invalidMessage: "Film must be of no earlier than 1970"},
-        { view: "text", label: "Rating", name: "rating", invalidMessage: "Rating cannot be empty or less than 0"},
+        { view: "text", label: "Rating", name: "rating", invalidMessage: "Rating cannot be empty or equal to 0"},
         { view: "text", label: "Votes", name: "votes", invalidMessage: "Votes cannot exceed 100.000 or be empty"},
 
         {

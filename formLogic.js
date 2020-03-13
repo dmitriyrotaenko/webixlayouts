@@ -1,5 +1,6 @@
-const clearForm = form => {
+function clearForm() {
   const films = $$("films");
+  const form = $$("form");
 
   films.unselectAll();
   form.clear();
@@ -12,25 +13,23 @@ function saveFilm() {
   const films = $$("films");
   const form = this.getFormView();
   const filmData = form.getValues();
-  
   const rank = +films.getItem(films.getLastId()).rank + 1; // to display rank correctly
 
 
 
   if(form.validate()) {
-    switch(filmData.id) {
-      case undefined:
-        filmData.rank = rank;
-        const id = films.add(filmData);
-        webix.message({type: "success", text: "Film was added successfully"});
-        films.showItem(id);
-      break;
-      default: 
-        films.updateItem(filmData.id, filmData);
-        webix.message({type: "success", text: "Film was updated successfully"});
-    } 
 
-    clearForm(form);
+    if(filmData.id) {
+      films.updateItem(filmData.id, filmData);
+      webix.message({type: "success", text: "Film was updated successfully"});
+    } else {
+      filmData.rank = rank;
+      const id = films.add(filmData);
+      webix.message({type: "success", text: "Film was added successfully"});
+      films.showItem(id);
+    }
+
+    clearForm();
   }
 };
 
@@ -42,7 +41,7 @@ function clearFields() {
     ok: "Yes", cancel: "No"
   })
   .then(() => {
-    clearForm(this.getFormView());
+    clearForm();
   })
 }
 
